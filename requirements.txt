@@ -1,0 +1,23 @@
+# DOCGEN AI-Native Engine Requirements
+
+# Core dependencies
+Flask==3.0.0
+flask-cors==4.0.0
+requests==2.31.0
+
+# Document processing
+markdown==3.5.1
+python-docx==1.1.0
+reportlab==4.0.7
+
+# Data handling
+pyyaml==6.0.1
+jsonschema==4.20.0
+pandas==2.1.4
+
+# Validation
+language-tool-python==2.8.0
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
