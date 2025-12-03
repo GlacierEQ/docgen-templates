@@ -1,0 +1,38 @@
+{
+  "inventory": {
+    "Legal Templates": {
+      "Motion Templates": 62,
+      "Federal Filings": 15,
+      "Declaration Templates": 8,
+      "Hawaii Court Specific": 12,
+      "Evidence Templates": 8
+    },
+    "Technical Templates": {
+      "API Documentation": 3,
+      "Code Documentation": 2,
+      "System Architecture": 5,
+      "Integration Guides": 4
+    },
+    "Project Templates": {
+      "Specifications": 3,
+      "Reports": 2,
+      "Meeting Notes": 1,
+      "Status Updates": 1
+    }
+  },
+  "baseline_metrics": {
+    "total_templates": 126,
+    "categories": 3,
+    "avg_per_category": 42.0,
+    "assessment_date": "2025-12-03 12:35:44 HST",
+    "repository_url": "https://github.com/GlacierEQ/docgen-templates",
+    "automation_ready": 126,
+    "ci_cd_integrated": true
+  },
+  "priority_gaps": [
+    "Technical Templates - Code Documentation: 2 (needs expansion)",
+    "Project Templates - Reports: 2 (needs expansion)",
+    "Project Templates - Meeting Notes: 1 (needs expansion)",
+    "Project Templates - Status Updates: 1 (needs expansion)"
+  ]
+}
