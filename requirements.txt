@@ -2,8 +2,8 @@
 
 # Core dependencies
 Flask==3.0.0
-flask-cors==4.0.0
-requests==2.31.0
+flask-cors==6.0.0
+requests==2.32.4
 
 # Document processing
 markdown==3.5.1
