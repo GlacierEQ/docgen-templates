@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""
+DOCGEN CLI Tool
+Command-line interface for instant document generation
+
+Usage:
+    docgen generate motion-stay --case 1FDV-23-0001009 --grounds "Due process"
+    docgen followthrough opposition.pdf --type response
+    docgen bulk cover-sheet --data exhibits.csv
+    docgen validate motion.md
+"""
+
+import argparse
+import sys
+import os
+import json
+
+# Add parent directory to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from sdk.ai_sdk import generate, followthrough, validate, batch
+
+def cmd_generate(args):
+    """Generate document from template"""
+    context = {}
+    
+    # Parse context from --key value pairs
+    for i in range(0, len(args.context), 2):
+        if i + 1 < len(args.context):
+            key = args.context[i].lstrip('--')
+            value = args.context[i + 1]
+            context[key] = value
+    
+    # Generate
+    content = generate(args.template, **context)
+    
+    # Save or print
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(content)
+        print(f"✅ Document saved to {args.output}")
+    else:
+        print(content)
+
+def cmd_followthrough(args):
+    """Generate follow-through document"""
+    content = followthrough(
+        original=args.original,
+        type=args.type
+    )
+    
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(content)
+        print(f"✅ Follow-through document saved to {args.output}")
+    else:
+        print(content)
+
+def cmd_bulk(args):
+    """Bulk generate from data file"""
+    docs = batch(args.template, args.data)
+    
+    # Save each document
+    for i, doc in enumerate(docs):
+        filename = f"{args.output_prefix}_{i+1}.md"
+        with open(filename, 'w') as f:
+            f.write(doc)
+        print(f"✅ Generated {filename}")
+    
+    print(f"\n✅ Total: {len(docs)} documents generated")
+
+def cmd_validate(args):
+    """Validate document"""
+    with open(args.file, 'r') as f:
+        content = f.read()
+    
+    results = validate(content, template=args.template)
+    
+    if results['passed']:
+        print("✅ Document validation PASSED")
+    else:
+        print("❌ Document validation FAILED")
+    
+    print(json.dumps(results['results'], indent=2))
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='DOCGEN CLI - AI-Native Document Generation',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Generate motion
+  docgen generate motion-stay --case 1FDV-23-0001009 --grounds "Due process" -o motion.md
+  
+  # Generate response
+  docgen followthrough opposition.pdf --type response -o response.md
+  
+  # Bulk generate
+  docgen bulk cover-sheet --data exhibits.csv --prefix exhibit
+  
+  # Validate
+  docgen validate motion.md --template motion-stay
+"""
+    )
+    
+    subparsers = parser.add_subparsers(dest='command', help='Commands')
+    
+    # Generate command
+    gen_parser = subparsers.add_parser('generate', help='Generate document')
+    gen_parser.add_argument('template', help='Template name')
+    gen_parser.add_argument('context', nargs='*', help='Context key-value pairs')
+    gen_parser.add_argument('-o', '--output', help='Output file')
+    
+    # Followthrough command
+    follow_parser = subparsers.add_parser('followthrough', help='Generate follow-through')
+    follow_parser.add_argument('original', help='Original document')
+    follow_parser.add_argument('--type', default='response', help='Follow-through type')
+    follow_parser.add_argument('-o', '--output', help='Output file')
+    
+    # Bulk command
+    bulk_parser = subparsers.add_parser('bulk', help='Bulk generate')
+    bulk_parser.add_argument('template', help='Template name')
+    bulk_parser.add_argument('--data', required=True, help='Data file (CSV/JSON)')
+    bulk_parser.add_argument('--prefix', default='doc', help='Output filename prefix')
+    
+    # Validate command
+    val_parser = subparsers.add_parser('validate', help='Validate document')
+    val_parser.add_argument('file', help='Document file')
+    val_parser.add_argument('--template', help='Template name for compliance check')
+    
+    args = parser.parse_args()
+    
+    if args.command == 'generate':
+        cmd_generate(args)
+    elif args.command == 'followthrough':
+        cmd_followthrough(args)
+    elif args.command == 'bulk':
+        cmd_bulk(args)
+    elif args.command == 'validate':
+        cmd_validate(args)
+    else:
+        parser.print_help()
+
+if __name__ == '__main__':
+    main()
